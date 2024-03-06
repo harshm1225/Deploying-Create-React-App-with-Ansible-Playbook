@@ -1,0 +1,85 @@
+- hosts: webservers
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: Install Node.js and Git on RedHat machine
+      dnf:
+        name:
+          - nodejs
+          - git
+        state: present
+      when: ansible_distribution=="RedHat"
+
+    - name: Install Node.js and Git on Ubuntu machine
+      apt:
+        name:
+          - nodejs
+          - npm
+          - git
+        state: present
+      when: ansible_distribution=="Ubuntu"
+
+    - name: Clone Git repository
+      git:
+        repo: https://github.com/amolshete/reactjs-demo.git
+        dest: /app 
+        force: yes
+
+    - name: Install project dependencies with npm
+      npm:
+        path: /app
+        state: present
+        
+
+    - name: Build project with npm
+      
+
+    - name: Install Apache Web Server on Ubuntu machine
+      apt:
+        name: apache2
+        state: latest
+        update_cache: yes
+      when: ansible_distribution=="Ubuntu"
+
+    - name: Install Apache Web Server on RedHat machine
+      yum:
+        name: httpd
+        state: latest
+        update_cache: yes
+      when: ansible_distribution=="RedHat"
+
+    - name: Enable Apache Web Server Service on Ubuntu machine
+      service:
+        name: apache2
+        enabled: true
+        state: started
+      when: ansible_distribution=="Ubuntu"
+
+    - name: Enable Apache Web Server Service on RedHat machine
+      service:
+        name: httpd
+        enabled: true
+        state: started
+      when: ansible_distribution=="RedHat"
+
+   
+    - name: Copy index.html to Default Apache Document root
+      copy:
+        src: /app/build
+        dest: /var/www/html
+
+  handlers:
+    - name: Restart Apache Web Service on RedHat instance
+      service:
+        name: httpd
+        enabled: true
+        state: restarted
+
+    - name: Restart Apache Web Service on Ubuntu instance
+      service:
+        name: apache2
+        enabled: true
+        state: restarted
+

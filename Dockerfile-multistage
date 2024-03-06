@@ -1,0 +1,38 @@
+# Use Node.js 16 Alpine as build environment
+FROM node:16-alpine AS build
+
+# Display the current user
+RUN whoami
+
+# List the files in the current directory
+RUN ls -l
+
+# Display the installed npm version
+RUN npm --version
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json files to the working directory
+COPY package*.json ./
+
+# Install npm dependencies
+RUN npm install
+
+# Copy all files from the current directory to the working directory
+COPY . .
+
+# Run the build script defined in package.json
+RUN npm run build
+
+# List files in the /app directory
+RUN ls /app
+
+# Use httpd Alpine as the base image for the final container
+FROM httpd:alpine
+
+# Copy the built files from the build environment to the web server's document root
+COPY --from=build /app/build /usr/local/apache2/htdocs/
+
+# List files in the document root directory of the web server
+RUN ls /usr/local/apache2/htdocs
