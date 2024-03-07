@@ -22,7 +22,7 @@
 
     - name: Clone Git repository
       git:
-        repo: https://github.com/amolshete/reactjs-demo.git
+        repo: https://github.com/harshm1225/reactjsdemo-ansible.git
         dest: /app
         force: yes
 
