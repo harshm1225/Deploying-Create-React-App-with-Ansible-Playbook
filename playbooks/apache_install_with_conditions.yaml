@@ -50,8 +50,6 @@
         chdir: /app
       when: ansible_distribution=="RedHat"
       ignore_errors: true
-      tags:
-        - first
 
     # Run npm build on Ubuntu
     - name: Run npm build on Ubuntu
@@ -98,6 +96,35 @@
     # Copy index.html to Default Apache Document root
     - name: Copy index.html to Default Apache Document root
       copy:
-        src: /app/build
-        dest: /var/www/html
+        src: /app/build/
+        dest: /var/www/html/
         remote_src: yes
+
+
+    # Configure Apache to use custom index.html on RedHat worker node
+    - name: Configure Apache to use custom index.html on RedHat worker node
+      ansible.builtin.replace:
+         path: /etc/httpd/conf/httpd.conf  # Path to the Apache configuration file on the remote machine
+         regexp: "^<LocationMatch \"^/+$\">(.|\n)*<\/LocationMatch>$"
+         replace: |
+           <Directory /var/www/html>
+           Options -Indexes FollowSymLinks
+           AllowOverride None
+           Require all granted
+           </Directory>
+
+           DirectoryIndex index.html
+
+           Alias /poweredby.png /usr/share/httpd/icons/apache_pb3.png
+           Alias /system_noindex_logo.png /usr/share/httpd/icons/system_noindex_logo.png
+      notify:
+         - Restart Apache Web Service on RedHat instance
+      when: ansible_distribution=="RedHat"
+
+
+  handlers:
+    - name: Restart Apache Web Service on RedHat instance
+      service:
+        name: httpd
+        enabled: true
+        state: restarted
