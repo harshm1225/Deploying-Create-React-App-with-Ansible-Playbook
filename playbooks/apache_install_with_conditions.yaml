@@ -15,8 +15,8 @@
           - nodejs
           - npm
           - git
-      state: present
-      update_cache: yes
+        state: present
+        update_cache: yes
       when: ansible_distribution=="RedHat"
 
     # Install Node.js 16 and Git on Ubuntu machine
@@ -26,8 +26,8 @@
           - nodejs
           - git
           - npm
-      state: present
-      update_cache: yes
+        state: present
+        update_cache: yes
       when: ansible_distribution=="Ubuntu"
 
     # Clone Git repository
@@ -50,6 +50,8 @@
         chdir: /app
       when: ansible_distribution=="RedHat"
       ignore_errors: true
+      tags:
+        - first
 
     # Run npm build on Ubuntu
     - name: Run npm build on Ubuntu
