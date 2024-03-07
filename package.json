@@ -10,7 +10,7 @@
     "react": "^16.13.1",
     "react-bootstrap": "^1.1.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.2"
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
