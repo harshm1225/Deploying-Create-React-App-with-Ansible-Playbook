@@ -99,21 +99,3 @@
         src: /app/build
         dest: /var/www/html
         remote_src: yes
-      notify:
-        - Restart Apache Web Service on RedHat instance
-        - Restart Apache Web Service on Ubuntu instance
-
-  handlers:
-    # Restart Apache Web Service on RedHat instance
-    - name: Restart Apache Web Service on RedHat instance
-      service:
-        name: httpd
-        enabled: true
-        state: restarted
-
-    # Restart Apache Web Service on Ubuntu instance
-    - name: Restart Apache Web Service on Ubuntu instance
-      service:
-        name: apache2
-        enabled: true
-        state: restarted
