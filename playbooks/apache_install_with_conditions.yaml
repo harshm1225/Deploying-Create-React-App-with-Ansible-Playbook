@@ -4,18 +4,17 @@
   become_user: root
 
   tasks:
-    - name: Install Node.js and Git on RedHat machine
-      dnf:
+    - name: Install Node.js 16 and Git on RedHat machine
+      yum:
         name:
-          - nodejs
+          - npm
           - git
         state: present
       when: ansible_distribution=="RedHat"
 
-    - name: Install Node.js and Git on Ubuntu machine
+    - name: Install Node.js 16 and Git on Ubuntu machine
       apt:
         name:
-          - nodejs
           - npm
           - git
         state: present
@@ -24,17 +23,25 @@
     - name: Clone Git repository
       git:
         repo: https://github.com/amolshete/reactjs-demo.git
-        dest: /app 
+        dest: /app
         force: yes
 
     - name: Install project dependencies with npm
-      npm:
-        path: /app
-        state: present
-        
+      command: /usr/bin/npm install
+      args:
+        chdir: /app
 
-    - name: Build project with npm
-      
+    - name: Run npm build in Ubuntu machine
+      command: /usr/bin/npm run build
+      args:
+        chdir: /app
+      when: ansible_distribution=="Ubuntu"
+
+    - name: Run npm build in RedHat machine
+      command: /usr/bin/npm run build
+      args:
+        chdir: /app
+      when: ansible_distribution=="RedHat"
 
     - name: Install Apache Web Server on Ubuntu machine
       apt:
@@ -67,19 +74,8 @@
    
     - name: Copy index.html to Default Apache Document root
       copy:
-        src: /app/build
-        dest: /var/www/html
-
-  handlers:
-    - name: Restart Apache Web Service on RedHat instance
-      service:
-        name: httpd
-        enabled: true
-        state: restarted
-
-    - name: Restart Apache Web Service on Ubuntu instance
-      service:
-        name: apache2
-        enabled: true
-        state: restarted
+       src: /app/build
+       dest: /var/www/html
+       remote_src: yes
+      
 
