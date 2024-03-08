@@ -99,22 +99,3 @@
         src: /app/build/
         dest: /var/www/html/
         remote_src: yes
-
-
-    # Configure Apache to use custom index.html on RedHat worker node
-    - name: Configure Apache to use custom index.html on RedHat worker node
-      ansible.builtin.replace:
-         path: /etc/httpd/conf/httpd.conf  # Path to the Apache configuration file on the remote machine
-         regexp: "^<LocationMatch \"^/+$\">(.|\n)*<\/LocationMatch>$"
-         replace: |
-           <Directory /var/www/html>
-           Options -Indexes FollowSymLinks
-           AllowOverride None
-           Require all granted
-           </Directory>
-
-           DirectoryIndex index.html
-
-           Alias /poweredby.png /usr/share/httpd/icons/apache_pb3.png
-           Alias /system_noindex_logo.png /usr/share/httpd/icons/system_noindex_logo.png
-      when: ansible_distribution=="RedHat"
