@@ -118,7 +118,7 @@
         remote_src: yes
       tags:
         - 11
-
+    # Set file permissions for Apache on RedHat
     - name: Set file permissions for Apache on RedHat
       file:
         path: /var/www/html
