@@ -99,3 +99,47 @@
         src: /app/build/
         dest: /var/www/html/
         remote_src: yes
+    
+    # Set file permissions for Apache on RedHat
+    - name: Set file permissions for Apache on RedHat
+      file:
+        path: /var/www/html
+        owner: apache
+        group: apache
+        mode: "0755"
+      when: ansible_distribution=="RedHat"
+
+    # Set file permissions for Apache on Ubuntu
+    - name: Set file permissions for Apache on Ubuntu
+      file:
+        path: /var/www/html
+        owner: www-data
+        group: www-data
+        mode: "0755"
+      when: ansible_distribution=="Ubuntu"
+
+      # Remove SELinux permissions and set to default for RedHat
+    - name: Remove SELinux permissions and set to default for RedHat
+      command: restorecon -Rv /var/www/html
+      when: ansible_distribution=="RedHat"
+
+    # Remove SELinux permissions and set to default for Ubuntu
+    - name: Remove SELinux permissions and set to default for Ubuntu
+      command: "chcon system_u:object_r:default_t /var/www/html"
+      when: ansible_distribution=="Ubuntu"
+
+      # Restart Apache service on RedHat
+    - name: Restart Apache service on RedHat
+      service:
+        name: httpd
+        state: restarted
+      when: ansible_distribution=="RedHat"
+
+    # Restart Apache service on Ubuntu
+    - name: Restart Apache service on Ubuntu
+      service:
+        name: apache2
+        state: restarted
+      when: ansible_distribution=="Ubuntu"
+
+    
