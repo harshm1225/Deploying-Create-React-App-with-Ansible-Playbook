@@ -117,14 +117,4 @@
 
            Alias /poweredby.png /usr/share/httpd/icons/apache_pb3.png
            Alias /system_noindex_logo.png /usr/share/httpd/icons/system_noindex_logo.png
-      notify:
-         - Restart Apache Web Service on RedHat instance
       when: ansible_distribution=="RedHat"
-
-
-  handlers:
-    - name: Restart Apache Web Service on RedHat instance
-      service:
-        name: httpd
-        enabled: true
-        state: restarted
