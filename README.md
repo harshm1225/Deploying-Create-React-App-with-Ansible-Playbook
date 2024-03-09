@@ -186,6 +186,8 @@ This documentation provides a step-by-step guide on how to deploy a React applic
     - 16
 ````
 
+16. Please ensure that you open the inbound security group for port 80 to access the hosted site on your RedHat and Ubuntu machines, which in my case are deployed on AWS.
+
 
 
 
