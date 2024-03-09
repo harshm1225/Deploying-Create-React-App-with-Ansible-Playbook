@@ -74,4 +74,14 @@ This documentation provides a step-by-step guide on how to deploy a React applic
         - 5
 ````
 
+6. This Ansible task installs the Apache Web Server on an Ubuntu machine using the apt package manager.
+```` bash
+    - name: Install Apache Web Server on Ubuntu machine
+      apt:
+        name: apache2
+        state: latest
+      when: ansible_distribution=="Ubuntu"
+      tags:
+        - 7
+````
 
