@@ -11,21 +11,18 @@ This documentation provides a step-by-step guide on how to deploy a React applic
 
 ## Understanding Tasks in Ansible Playbook
 
-1. Install Node.js and Git on RedHat machine
+1. Install Node.js, npm, and Git on RedHat machine if not already installed, updating the package cache before installation.
 ```` bash
-# Install Node.js and Git on RedHat machine
-- name: Install Node.js and Git  # Descriptive task name
-  dnf:                          # Module used for package management
-    name:                         # List of packages to install
+- name: Install Node.js and Git  
+  dnf:                          
+    name:                        
       - nodejs
       - npm
       - git
-    state: present               # Desired state (installed)
-    update_cache: yes            # Update package cache before install
-  when: ansible_distribution=="RedHat"  # Conditional execution for RedHat
-  tags:                          # Optional tags for grouping tasks
+    state: present               
+    update_cache: yes            
+  when: ansible_distribution=="RedHat"  
+  tags:                          
     - 1
 ````
-
-
 
