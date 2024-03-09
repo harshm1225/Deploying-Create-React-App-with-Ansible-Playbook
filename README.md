@@ -26,3 +26,52 @@ This documentation provides a step-by-step guide on how to deploy a React applic
     - 1
 ````
 
+2. Install Node.js, npm, and Git on Ubuntu machine if not already installed, updating the package cache before installation.
+```` bash
+  - name: Install Node.js 16 and Git on Ubuntu machine
+      apt:
+        name:
+          - nodejs
+          - git
+          - npm
+        state: present
+        update_cache: yes
+      when: ansible_distribution=="Ubuntu"
+      tags:
+        - 2
+````
+
+3. This Ansible task clones a Git repository into the "/app" directory, forcefully overwriting any existing content.
+```` bash
+    - name: Clone Git repository
+      git:
+        repo: https://github.com/harshm1225/create-react-app.git
+        dest: /app
+        force: yes
+      tags:
+        - 3
+````
+
+4. This Ansible task installs project dependencies using npm within the "/app" directory.
+```` bash
+    - name: Install project dependencies with npm
+      command: /usr/bin/npm install
+      args:
+        chdir: /app
+      tags:
+        - 4
+````
+
+5. This Ansible task runs npm build within the "/app" directory, based on the distribution being RedHat or Ubuntu.
+```` bash
+    - name: Run npm build
+      block:
+          command: /usr/bin/npm run build
+          args:
+            chdir: /app
+      when: ansible_distribution == "RedHat" or ansible_distribution == "Ubuntu"
+      tags:
+        - 5
+````
+
+
