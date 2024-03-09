@@ -1,0 +1,164 @@
+---
+# Playbook to set up a web server environment with Node.js, Git, and Apache on RedHat and Ubuntu machines
+
+- name: Setup web server environment
+  hosts: webservers
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+
+    # Install Node.js and Git on RedHat machine
+    - name: Install Node.js and Git on RedHat machine
+      dnf:
+        name:
+          - nodejs
+          - npm
+          - git
+        state: present
+        update_cache: yes
+      when: ansible_distribution=="RedHat"
+      tags:
+        - 1
+
+    # Install Node.js 16 and Git on Ubuntu machine
+    - name: Install Node.js 16 and Git on Ubuntu machine
+      apt:
+        name:
+          - nodejs
+          - git
+          - npm
+        state: present
+        update_cache: yes
+      when: ansible_distribution=="Ubuntu"
+      tags:
+        - 2
+
+    # Clone Git repository
+    - name: Clone Git repository
+      git:
+        repo: https://github.com/harshm1225/create-react-app.git
+        dest: /app
+        force: yes
+      tags:
+        - 3
+
+    # Install project dependencies with npm
+    - name: Install project dependencies with npm
+      command: /usr/bin/npm install
+      args:
+        chdir: /app
+      tags:
+        - 4     
+
+    # Run npm build on RedHat and Ubuntu machine
+    - name: Run npm build within the "/app" directory, based on the distribution being RedHat or Ubuntu.
+      block:
+        - command: /usr/bin/npm run build
+          args:
+            chdir: /app
+      when: ansible_distribution == "RedHat" or ansible_distribution == "Ubuntu"
+      tags:
+        - 5
+
+    # Install Apache Web Server on Ubuntu machine
+    - name: Install Apache Web Server on Ubuntu machine
+      apt:
+        name: apache2
+        state: latest
+      when: ansible_distribution=="Ubuntu"
+      tags:
+        - 6
+
+    # Install Apache Web Server on RedHat machine
+    - name: Install Apache Web Server on RedHat machine
+      yum:
+        name: httpd
+        state: latest
+      when: ansible_distribution=="RedHat"
+      tags:
+        - 7
+
+    # Enable Apache Web Server Service on Ubuntu machine
+    - name: Enable Apache Web Server Service on Ubuntu machine
+      service:
+        name: apache2
+        enabled: true
+        state: started
+      when: ansible_distribution=="Ubuntu"
+      tags:
+        - 8
+
+    # Enable Apache Web Server Service on RedHat machine
+    - name: Enable Apache Web Server Service on RedHat machine
+      service:
+        name: httpd
+        enabled: true
+        state: started
+      when: ansible_distribution=="RedHat"
+      tags:
+        - 9
+
+    # Copy index.html to Default Apache Document root
+    - name: Copy index.html to Default Apache Document root
+      copy:
+        src: /app/build/
+        dest: /var/www/html/
+        remote_src: yes
+      tags:
+        - 10
+
+    - name: Set file permissions for Apache on RedHat
+      file:
+        path: /var/www/html
+        owner: apache
+        group: apache
+        mode: "0755"
+      when: ansible_distribution=="RedHat"
+      tags:
+        - 11
+
+    # Set file permissions for Apache on Ubuntu
+    - name: Set file permissions for Apache on Ubuntu
+      file:
+        path: /var/www/html
+        owner: www-data
+        group: www-data
+        mode: "0755"
+      when: ansible_distribution=="Ubuntu"
+      tags:
+        - 12
+
+      # Remove SELinux permissions and set to default for RedHat
+    - name: Remove SELinux permissions and set to default for RedHat
+      command: restorecon -Rv /var/www/html
+      when: ansible_distribution=="RedHat"
+      tags:
+        - 13
+
+    # Remove SELinux permissions and set to default for Ubuntu
+    - name: Remove SELinux permissions and set to default for Ubuntu
+      command: chcon system_u:object_r:default_t /var/www/html
+      when: ansible_distribution=="Ubuntu"
+      tags:
+        - 14
+
+      # Restart Apache service on RedHat
+    - name: Restart Apache service on RedHat
+      service:
+        name: httpd
+        state: restarted
+      when: ansible_distribution=="RedHat"
+      tags:
+        - 15
+
+    # Restart Apache service on Ubuntu
+    - name: Restart Apache service on Ubuntu
+      service:
+        name: apache2
+        state: restarted
+      when: ansible_distribution=="Ubuntu"
+      tags:
+        - 16
+
